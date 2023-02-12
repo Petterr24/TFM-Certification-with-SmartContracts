@@ -15,8 +15,11 @@ contract UserAuthorization {
         // Set the Instance address to the address of the contract
         s_UserAuthorization = address(this);
 
-        // Set the Admin address to be the only one to register new users
+        // Set the Admin address of who deployed the Smart Contract
         admin = msg.sender;
+
+        // Add this admin user to the users mapping
+        users[msg.sender] = User(msg.sender, uint8(PrivilegeLevel.ADMIN));
     }
 
     // Data structure for users
@@ -114,7 +117,7 @@ contract UserAuthorization {
     }
 
     modifier isAdmin() {
-        require(msg.sender == admin, "You are not authorized to perform this action!");
+        require(msg.sender == admin || users[msg.sender].privilegeLevel == uint8(PrivilegeLevel.ADMIN), "You are not authorized to perform this action!");
         _;
     }
 
