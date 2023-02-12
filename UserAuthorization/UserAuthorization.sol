@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 // Smart Contract to store the privileges of those users that can create new Smart Contracts or issue new Certificates
@@ -7,20 +8,6 @@ contract UserAuthorization {
 
     // Admin address
     address public admin;
-
-    constructor() {
-        // Check if an instance of this Smart Contract already exists
-        require(s_UserAuthorization == address(0), "The Instance of this Smart Contract already exists");
-        
-        // Set the Instance address to the address of the contract
-        s_UserAuthorization = address(this);
-
-        // Set the Admin address of who deployed the Smart Contract
-        admin = msg.sender;
-
-        // Add this admin user to the users mapping
-        users[msg.sender] = User(msg.sender, uint8(PrivilegeLevel.ADMIN));
-    }
 
     // Data structure for users
     struct User {
@@ -38,6 +25,20 @@ contract UserAuthorization {
         PART,
         COLLECTION,
         ADMIN
+    }
+
+    constructor() {
+        // Check if an instance of this Smart Contract already exists
+        require(s_UserAuthorization == address(0), "The Instance of this Smart Contract already exists");
+        
+        // Set the Instance address to the address of the contract
+        s_UserAuthorization = address(this);
+
+        // Set the Admin address of who deployed the Smart Contract
+        admin = msg.sender;
+
+        // Add this admin user to the users mapping
+        users[msg.sender] = User(msg.sender, uint8(PrivilegeLevel.ADMIN));
     }
 
     // Event for logging user authorization
@@ -114,6 +115,14 @@ contract UserAuthorization {
 
         // Checks if the user is authorized and has the required privilege level
         return user.privilegeLevel >= _requiredPrivilegeLevel;
+    }
+
+    function isAdminUser(address _userAddress) public view returns (bool) {
+        return (_userAddress == admin || users[_userAddress].privilegeLevel == uint8(PrivilegeLevel.ADMIN));
+    }
+
+    function isUserRegistered(address _userAddress) public view returns (bool) {
+        return (users[_userAddress].userAddress != address(0));
     }
 
     modifier isAdmin() {
