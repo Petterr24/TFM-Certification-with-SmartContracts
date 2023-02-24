@@ -31,6 +31,7 @@ contract SculptureFactory {
         SculptureLibrary.ConservationData memory _conservationData,
         string memory _sculptureOwner
     ) public {
+        //TODO: Check if the provided data is correct
         address newSculpture = address(new Sculpture(_persistentData, _miscData, _editionData, _conservationData, _sculptureOwner));
 
         sculptures.push(newSculpture);

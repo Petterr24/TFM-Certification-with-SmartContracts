@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-// Smart Contract to store the privileges of those users that can create new Smart Contracts or issue new Certificates
+// Smart Contract to store the privileges of those users that can create new Smart Contracts
 contract UserAuthorization {
     // Singleton to allow only creating one Instance of this Smart Contract
     address public s_UserAuthorization;
@@ -21,9 +21,7 @@ contract UserAuthorization {
     // Enum for different privilege levels
     enum PrivilegeLevel {
         NONE,
-        CERTIFICATION,
-        PART,
-        COLLECTION,
+        USER,
         ADMIN
     }
 
