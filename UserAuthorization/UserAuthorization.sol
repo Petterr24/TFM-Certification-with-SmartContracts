@@ -74,7 +74,7 @@ contract UserAuthorization {
         // Stores the user data
         users[_userAddress] = User(_userAddress, _privilegeLevel);
 
-        if (isAdminUser(_userAddress)) {
+        if (_privilegeLevel == uint8(PrivilegeLevel.ADMIN)) {
             numOfAdmins++;
         }
 
