@@ -98,7 +98,7 @@ contract UserAuthorization {
         require (_oldPrivilegeLevel != _newPrivilegeLevel, "Action reverted since privileges are the same");
 
         if (isAdminUser(_userAddress)) {
-            require(numOfAdmins > 2, "This admin cannot reduce its privileges since there must be at least one Admin user");
+            require(numOfAdmins > 1, "This admin cannot reduce its privileges since there must be at least one Admin user");
         }
 
         // Stores the new Privilege level
@@ -118,7 +118,7 @@ contract UserAuthorization {
     ) public isAdmin isAnExistingUser(_userAddress) {
         
         if (isAdminUser(_userAddress)) {
-            require(numOfAdmins > 2, "This admin cannot be removed since there must be at least one Admin user");
+            require(numOfAdmins > 1, "This admin cannot be removed since there must be at least one Admin user");
             numOfAdmins--;
         }
 
