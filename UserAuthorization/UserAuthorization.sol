@@ -5,9 +5,6 @@ pragma solidity ^0.8.0;
 contract UserAuthorization {
     // Singleton to allow only creating one Instance of this Smart Contract
     address private s_UserAuthorization;
-
-    // Admin address
-    address private admin;
     
     // Count the number of admin users
     uint256 numOfAdmins;
@@ -34,9 +31,6 @@ contract UserAuthorization {
         
         // Set the Instance address to the address of the contract
         s_UserAuthorization = address(this);
-
-        // Set the Admin address of who deployed the Smart Contract
-        admin = msg.sender;
 
         // Increse the number of admins
         numOfAdmins++;
@@ -142,7 +136,7 @@ contract UserAuthorization {
     }
 
     function isAdminUser(address _userAddress) public view returns (bool) {
-        return (_userAddress == admin || users[_userAddress].privilegeLevel == uint8(PrivilegeLevel.ADMIN));
+        return users[_userAddress].privilegeLevel == uint8(PrivilegeLevel.ADMIN);
     }
 
     function isUserRegistered(address _userAddress) public view returns (bool) {
@@ -154,7 +148,7 @@ contract UserAuthorization {
     }
 
     modifier isAdmin() {
-        require(msg.sender == admin || users[msg.sender].privilegeLevel == uint8(PrivilegeLevel.ADMIN), "You are not authorized to perform this action!");
+        require(users[msg.sender].privilegeLevel == uint8(PrivilegeLevel.ADMIN), "You are not authorized to perform this action!");
         _;
     }
 
