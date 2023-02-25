@@ -100,6 +100,8 @@ contract UserAuthorization {
 
         if (_newPrivilegeLevel == uint8(PrivilegeLevel.ADMIN)) {
             numOfAdmins++;
+        } else if (_newPrivilegeLevel < uint8(PrivilegeLevel.ADMIN)) {
+            numOfAdmins--;
         }
 
         // Emits the event for logging the user authorization
