@@ -51,16 +51,19 @@ contract SculptureFactory {
         SculptureLibrary.EditionData memory _editionData,
         SculptureLibrary.ConservationData memory _conservationData,
         string memory _sculptureOwner
-    ) public {
+    ) public payable returns(Sculpture) {
         // Checks if the user is an Admin user
         require(userAuthorizationInstance.isAuthorizedToCreate(msg.sender) == true, "Your are not authorized to create a record.");
 
         //TODO: Check if the provided data is correct
-        address newSculpture = address(new Sculpture(_persistentData, _miscData, _editionData, _conservationData, _sculptureOwner, address(userAuthorizationInstance)));
+        Sculpture newSculpture = new Sculpture{value: msg.value}(_persistentData, _miscData, _editionData, _conservationData, _sculptureOwner, address(userAuthorizationInstance));
+        address newSculptureAddress = address(newSculpture);
 
-        sculptures.push(newSculpture);
+        sculptures.push(newSculptureAddress);
 
         emit SculptureCreated(_persistentData, _miscData, _editionData, _conservationData);
+
+        return newSculpture;
     }
 }
 
@@ -85,7 +88,7 @@ contract Sculpture {
         SculptureLibrary.ConservationData memory _conservationData,
         string memory _sculptureOwner,
         address _userAuthorizationAddress
-    ) {
+    ) payable {
         persistentData = _persistentData;
         miscData = _miscData;
         editionData = _editionData;
