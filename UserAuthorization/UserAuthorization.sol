@@ -149,6 +149,10 @@ contract UserAuthorization {
         return (users[_userAddress].userAddress != address(0));
     }
 
+    function getNumAdmins() public view returns (uint256) {
+        return numOfAdmins;
+    }
+
     modifier isAdmin() {
         require(msg.sender == admin || users[msg.sender].privilegeLevel == uint8(PrivilegeLevel.ADMIN), "You are not authorized to perform this action!");
         _;
