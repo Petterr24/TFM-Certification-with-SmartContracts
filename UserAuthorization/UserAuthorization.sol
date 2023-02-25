@@ -8,6 +8,9 @@ contract UserAuthorization {
 
     // Admin address
     address private admin;
+    
+    // Count the number of admin users
+    uint256 numOfAdmins;
 
     // Data structure for users
     struct User {
@@ -34,6 +37,9 @@ contract UserAuthorization {
 
         // Set the Admin address of who deployed the Smart Contract
         admin = msg.sender;
+
+        // Increse the number of admins
+        numOfAdmins++;
 
         // Add this admin user to the users mapping
         users[msg.sender] = User(msg.sender, uint8(PrivilegeLevel.ADMIN));
@@ -96,6 +102,11 @@ contract UserAuthorization {
     function removeAuthorizedUser(
         address _userAddress
     ) public isAdmin isAnExistingUser(_userAddress) {
+        
+        if (isAdminUser(_userAddress)) {
+            require(numOfAdmins > 2, "This admin user cannot be removed since there must be at least one Admin user");
+        }
+
         users[_userAddress].userAddress = address(0);
         users[_userAddress].privilegeLevel = uint8(PrivilegeLevel.NONE);
 
