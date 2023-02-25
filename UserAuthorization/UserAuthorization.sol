@@ -4,10 +4,10 @@ pragma solidity ^0.8.0;
 // Smart Contract to store the privileges of those users that can create new Smart Contracts
 contract UserAuthorization {
     // Singleton to allow only creating one Instance of this Smart Contract
-    address public s_UserAuthorization;
+    address private s_UserAuthorization;
 
     // Admin address
-    address public admin;
+    address private admin;
 
     // Data structure for users
     struct User {
@@ -16,7 +16,7 @@ contract UserAuthorization {
     }
 
     // Mapping from user address to user data
-    mapping (address => User) public users;
+    mapping (address => User) private users;
 
     // Enum for different privilege levels
     enum PrivilegeLevel {
@@ -103,16 +103,16 @@ contract UserAuthorization {
         emit UserRemoved(_userAddress);
     }
 
-    // Checks if a user has the minimum provided privileges
-    function isAuthorized(
-        address _userAddress,
-        uint8 _requiredPrivilegeLevel
-    ) public isAnExistingUser(_userAddress) view returns (bool) {
-        // Retrieves the user data
-        User storage user = users[_userAddress];
-
+    // Checks if a user has the minimum privileges to create a Record
+    function isAuthorizedToCreate(address _userAddress) public isAnExistingUser(_userAddress) view returns (bool) {
         // Checks if the user is authorized and has the required privilege level
-        return user.privilegeLevel >= _requiredPrivilegeLevel;
+        return users[_userAddress].privilegeLevel == uint8(PrivilegeLevel.ADMIN);
+    }
+
+    // Checks if a user has the minimum privileges to update a Record
+    function isAuthorizedToUpdate(address _userAddress) public isAnExistingUser(_userAddress) view returns (bool) {
+        // Checks if the user is authorized and has the required privilege level
+        return users[_userAddress].privilegeLevel >= uint8(PrivilegeLevel.USER);
     }
 
     function isAdminUser(address _userAddress) public view returns (bool) {
