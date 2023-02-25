@@ -42,7 +42,7 @@ contract UserAuthorization {
     // Event for logging user authorization
     event UserAuthorized(
         address indexed userAddress,
-        uint8 privilegeLevel
+        string privilegeLevel
     );
 
     // Event for logging privilege modifications
@@ -69,7 +69,7 @@ contract UserAuthorization {
         users[_userAddress] = User(_userAddress, _privilegeLevel);
 
         // Emits the event for logging the user authorization
-        emit UserAuthorized(_userAddress, _privilegeLevel);
+        emit UserAuthorized(_userAddress, getPrivilegeAsString(uint8(_privilegeLevel)));
     }
 
     // Changes the user privileges
@@ -137,5 +137,17 @@ contract UserAuthorization {
         // Checks if the user exists
         require(users[_userAddress].userAddress != address(0), "The user does not exist!");
         _;
+    }
+
+    function getPrivilegeAsString(uint8 _privilege) private pure returns (string memory) {
+        if (_privilege == uint8(PrivilegeLevel.NONE)) {
+            return "User without privileges to create or update records";
+        } else if (_privilege == uint8(PrivilegeLevel.USER)) {
+            return "User with privileges to update an existing record";
+        } else if (_privilege == uint8(PrivilegeLevel.ADMIN)) {
+            return "User with privileges to create or update records";
+        } else {
+            revert("Invalid privilege value");
+        }
     }
 }
