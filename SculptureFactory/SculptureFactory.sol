@@ -113,7 +113,7 @@ contract Sculpture {
         string memory _technique,
         string memory _dimensions,
         string memory _location,
-        SculptureLibrary.CategorizationLabel _categorizationLabel,
+        uint8 _categorizationLabel,
         bool _edition,
         string memory _editionExecutor,
         string memory _editionNumber
@@ -155,7 +155,7 @@ contract Sculpture {
             updatedData.location = _location;
         }
 
-        if (SculptureLibrary.isCategorizationLabelValid(uint8(_categorizationLabel))) {
+        if (SculptureLibrary.isCategorizationLabelValid(_categorizationLabel)) {
             miscData.categorizationLabel = _categorizationLabel;
             updatedData.categorizationLabel = SculptureLibrary.getCategorizationLabelAsString(_categorizationLabel);
         }

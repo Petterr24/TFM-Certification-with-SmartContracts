@@ -35,7 +35,7 @@ library SculptureLibrary {
         string technique;
         string dimensions;
         string location;
-        CategorizationLabel categorizationLabel;
+        uint8 categorizationLabel;
     }
 
     struct EditionData {
@@ -46,39 +46,39 @@ library SculptureLibrary {
 
     struct ConservationData {
         bool conservation;
-        ConservationLabel conservationLabel;
+        uint8 conservationLabel;
     }
 
     function isCategorizationLabelValid(uint8 label) internal pure returns (bool) {
-        return label >= uint8(CategorizationLabel.AUTHORIZED_DIGITAL_COPY);
+        return (label >= uint8(CategorizationLabel.AUTHORIZED_UNIQUE_WORK) && label <= uint8(CategorizationLabel.AUTHORIZED_DIGITAL_COPY));
     }
 
     function isConservationLabelValid(uint8 label) internal pure returns (bool) {
-        return label >= uint8(ConservationLabel.AUTHORIZED_EPHEMERAL_WORK);
+        return (label >= uint8(ConservationLabel.AUTHORIZED_RECONSTRUCTION) && label <= uint8(ConservationLabel.AUTHORIZED_EPHEMERAL_WORK));
     }
 
-    function getCategorizationLabelAsString(CategorizationLabel _enum) internal pure returns (string memory) {
-        if (_enum == CategorizationLabel.AUTHORIZED_UNIQUE_WORK) {
+    function getCategorizationLabelAsString(uint8 _enum) internal pure returns (string memory) {
+        if (_enum == uint8(CategorizationLabel.AUTHORIZED_UNIQUE_WORK)) {
             return "Authorized unique work";
-        } else if (_enum == CategorizationLabel.AUTHORIZED_UNIQUE_WORK_VARIATION) {
+        } else if (_enum == uint8(CategorizationLabel.AUTHORIZED_UNIQUE_WORK_VARIATION)) {
             return "Authorized unique work variation";
-        } else if (_enum == CategorizationLabel.AUTHORIZED_WORK) {
+        } else if (_enum == uint8(CategorizationLabel.AUTHORIZED_WORK)) {
             return "Authorized work";
-        } else if (_enum == CategorizationLabel.AUTHORIZED_MULTIPLE) {
+        } else if (_enum == uint8(CategorizationLabel.AUTHORIZED_MULTIPLE)) {
             return "Authorized multiple";
-        } else if (_enum == CategorizationLabel.AUTHORIZED_CAST) {
+        } else if (_enum == uint8(CategorizationLabel.AUTHORIZED_CAST)) {
             return "Authorized cast";
-        } else if (_enum == CategorizationLabel.POSTHUMOUS_WORK_AUTHORIZED_BY_ARTIST) {
+        } else if (_enum == uint8(CategorizationLabel.POSTHUMOUS_WORK_AUTHORIZED_BY_ARTIST)) {
             return "Posthumous work authorized by artist";
-        } else if (_enum == CategorizationLabel.POSTHUMOUS_WORK_AUTHORIZED_BY_RIGHTSHOLDERS) {
+        } else if (_enum == uint8(CategorizationLabel.POSTHUMOUS_WORK_AUTHORIZED_BY_RIGHTSHOLDERS)) {
             return "Posthumous work authorized by rightsholders";
-        } else if (_enum == CategorizationLabel.AUTHORIZED_REPRODUCTION) {
+        } else if (_enum == uint8(CategorizationLabel.AUTHORIZED_REPRODUCTION)) {
             return "Authorized reproduction";
-        } else if (_enum == CategorizationLabel.AUTHORIZED_EXHIBITION_COPY) {
+        } else if (_enum == uint8(CategorizationLabel.AUTHORIZED_EXHIBITION_COPY)) {
             return "Authorized exhibition copy";
-        } else if (_enum == CategorizationLabel.AUTHORIZED_TECHNICAL_COPY) {
+        } else if (_enum == uint8(CategorizationLabel.AUTHORIZED_TECHNICAL_COPY)) {
             return "Authorized technical copy";
-        } else if (_enum == CategorizationLabel.AUTHORIZED_DIGITAL_COPY) {
+        } else if (_enum == uint8(CategorizationLabel.AUTHORIZED_DIGITAL_COPY)) {
             return "Authorized digital copy";
         }
 
