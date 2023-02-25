@@ -48,4 +48,12 @@ library SculptureLibrary {
         bool conservation;
         ConservationLabel conservationLabel;
     }
+
+    function isCategorizationLabelValid(uint8 label) internal pure returns (bool) {
+        return label >= uint8(CategorizationLabel.AUTHORIZED_DIGITAL_COPY);
+    }
+
+    function isConservationLabelValid(uint8 label) internal pure returns (bool) {
+        return label >= uint8(ConservationLabel.AUTHORIZED_EPHEMERAL_WORK);
+    }
 }
