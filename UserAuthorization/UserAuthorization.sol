@@ -126,13 +126,13 @@ contract UserAuthorization {
     }
 
     // Checks if a user has the minimum privileges to create a Record
-    function isAuthorizedToCreate(address _userAddress) public isAnExistingUser(_userAddress) view returns (bool) {
+    function isAuthorizedToCreate(address _userAddress) public view returns (bool) {
         // Checks if the user is authorized and has the required privilege level
         return users[_userAddress].privilegeLevel == uint8(PrivilegeLevel.ADMIN);
     }
 
     // Checks if a user has the minimum privileges to update a Record
-    function isAuthorizedToUpdate(address _userAddress) public isAnExistingUser(_userAddress) view returns (bool) {
+    function isAuthorizedToUpdate(address _userAddress) public view returns (bool) {
         // Checks if the user is authorized and has the required privilege level
         return users[_userAddress].privilegeLevel >= uint8(PrivilegeLevel.USER);
     }
