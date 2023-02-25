@@ -54,8 +54,8 @@ contract UserAuthorization {
     // Event for logging privilege modifications
     event NewUserPrivilege(
         address indexed userAddress,
-        uint8 oldPrivilegeLevel,
-        uint8 newPrivilegeLevel
+        string oldPrivilegeLevel,
+        string newPrivilegeLevel
     );
 
     // Event for logging user deletion
@@ -74,6 +74,10 @@ contract UserAuthorization {
         // Stores the user data
         users[_userAddress] = User(_userAddress, _privilegeLevel);
 
+        if (isAdminUser(_userAddress)) {
+            numOfAdmins++;
+        }
+
         // Emits the event for logging the user authorization
         emit UserAuthorized(_userAddress, getPrivilegeAsString(uint8(_privilegeLevel)));
     }
@@ -91,11 +95,21 @@ contract UserAuthorization {
         require(users[_userAddress].userAddress == _userAddress 
             && users[_userAddress].privilegeLevel == _oldPrivilegeLevel, "The provided old privilege does not match with the stored one");
 
+        require (_oldPrivilegeLevel != _newPrivilegeLevel, "Action reverted since privileges are the same");
+
+        if (isAdminUser(_userAddress)) {
+            require(numOfAdmins > 2, "This admin cannot reduce its privileges since there must be at least one Admin user");
+        }
+
         // Stores the new Privilege level
         users[_userAddress].privilegeLevel = _newPrivilegeLevel;
 
+        if (_newPrivilegeLevel == uint8(PrivilegeLevel.ADMIN)) {
+            numOfAdmins++;
+        }
+
         // Emits the event for logging the user authorization
-        emit NewUserPrivilege(_userAddress, _oldPrivilegeLevel, _newPrivilegeLevel);
+        emit NewUserPrivilege(_userAddress, getPrivilegeAsString(_oldPrivilegeLevel), getPrivilegeAsString(_newPrivilegeLevel));
     }
 
     // Removes an Authorized User
@@ -104,7 +118,8 @@ contract UserAuthorization {
     ) public isAdmin isAnExistingUser(_userAddress) {
         
         if (isAdminUser(_userAddress)) {
-            require(numOfAdmins > 2, "This admin user cannot be removed since there must be at least one Admin user");
+            require(numOfAdmins > 2, "This admin cannot be removed since there must be at least one Admin user");
+            numOfAdmins--;
         }
 
         users[_userAddress].userAddress = address(0);
