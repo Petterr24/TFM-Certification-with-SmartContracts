@@ -2,14 +2,18 @@
 pragma solidity ^0.8.0;
 
 import "../SculptureLibrary/SculptureLibrary.sol";
+import "../UserAuthorization/UserAuthorization.sol";
 
 contract SculptureFactory {
     
-    address[] public sculptures;
+    // Singleton to allow only creating one Instance of this Smart Contract
+    address private s_SculptureFactory;
 
-    // Insert the admin's public key and address as private variables
-    bytes32 private ownerPublicKeyHash;
-    address private ownerPublicKeyAddress;
+    // Stores the addresses of the deployed SC (records)
+    address[] private sculptures;
+
+    // UserAuthorization instance
+    UserAuthorization userAuthorizationInstance;
 
     event SculptureCreated(
         SculptureLibrary.PersistentData persistentData,
@@ -18,10 +22,27 @@ contract SculptureFactory {
         SculptureLibrary.ConservationData conservationData
     );
 
-    constructor() {
-        // Insert the admin's public key hash as a constant and its address
-        ownerPublicKeyHash = keccak256(abi.encodePacked(msg.sender));
-        ownerPublicKeyAddress = msg.sender;
+    constructor(address _userAuthorizationAddress) {
+        // Checks if an instance of this Smart Contract already exists
+        require(s_SculptureFactory == address(0), "The Instance of this Smart Contract already exists");
+
+        //TODO: checks if the address is a correct SC address
+        userAuthorizationInstance = UserAuthorization(_userAuthorizationAddress);
+
+        // Checks if the user to deploy this SC is an admin user
+        require(userAuthorizationInstance.isAdminUser(msg.sender), "You are not authorized to deploy this SC");
+
+        // Sets the Instance address to the address of the contract
+        s_SculptureFactory = address(this);
+    }
+
+    function parseSculptureData(SculptureLibrary.PersistentData memory _persistentData,
+        SculptureLibrary.MiscellaneousData memory _miscData,
+        SculptureLibrary.EditionData memory _editionData,
+        SculptureLibrary.ConservationData memory _conservationData,
+        string memory _sculptureOwner
+    ) private {
+
     }
 
     function createSculpture(
@@ -31,8 +52,11 @@ contract SculptureFactory {
         SculptureLibrary.ConservationData memory _conservationData,
         string memory _sculptureOwner
     ) public {
+        // Checks if the user is an Admin user
+        require(userAuthorizationInstance.isAuthorizedToCreate(msg.sender) == true, "Your are not authorized to create a record.");
+
         //TODO: Check if the provided data is correct
-        address newSculpture = address(new Sculpture(_persistentData, _miscData, _editionData, _conservationData, _sculptureOwner));
+        address newSculpture = address(new Sculpture(_persistentData, _miscData, _editionData, _conservationData, _sculptureOwner, address(userAuthorizationInstance)));
 
         sculptures.push(newSculpture);
 
@@ -41,10 +65,13 @@ contract SculptureFactory {
 }
 
 contract Sculpture {
-    // Insert the owner's public key and address as private variables
-    bytes32 private ownerPublicKeyHash;
-    address private ownerPublicKeyAddress;
+    // UserAuthorization instance
+    UserAuthorization userAuthorizationInstance;
 
+    // UNIX Time of the last unit modification
+    uint256 public lastChangeTimestamp;
+
+    // Sculpture data
     string private sculptureOwner;
     SculptureLibrary.PersistentData public persistentData;
     SculptureLibrary.MiscellaneousData public miscData;
@@ -56,16 +83,18 @@ contract Sculpture {
         SculptureLibrary.MiscellaneousData memory _miscData,
         SculptureLibrary.EditionData memory _editionData,
         SculptureLibrary.ConservationData memory _conservationData,
-        string memory _sculptureOwner
+        string memory _sculptureOwner,
+        address _userAuthorizationAddress
     ) {
         persistentData = _persistentData;
         miscData = _miscData;
         editionData = _editionData;
         conservationData = _conservationData;
         sculptureOwner = _sculptureOwner;
+        userAuthorizationInstance = UserAuthorization(_userAuthorizationAddress);
     }
 
-    // event SculptureUpdated(bytes32 indexed hash, uint lastModifiedDate, address authorizedModifier);
+    // event SculptureUpdated(uint256 timestamp, address authorizedModifier);
 
     // TODO: add the owner
     function updateSculpture(
@@ -78,15 +107,41 @@ contract Sculpture {
         string memory _editionExecutor,
         uint256 _editionNumber
     ) public {
-        miscData.date = _date;
-        miscData.technique = _technique;
-        miscData.dimensions = _dimensions;
-        miscData.location = _location;
-        miscData.categorizationLabel = _categorizationLabel;
+        // Checks if the user has privileges to update the data
+        require(userAuthorizationInstance.isAuthorizedToUpdate(msg.sender) == true, "Your are not authorized to update a record.");
 
-        editionData.edition = _edition;
-        editionData.editionExecutor = _editionExecutor;
-        editionData.editionNumber = _editionNumber;
+        if (_date > 0) {
+            miscData.date = _date;
+        }
+
+        if (bytes(_technique).length > 0) {
+            miscData.technique = _technique;
+        }
+
+        if (bytes(_dimensions).length > 0) {
+            miscData.dimensions = _dimensions;
+        }
+
+        if (bytes(_location).length > 0) {
+            miscData.location = _location;
+        }
+
+        if (SculptureLibrary.isCategorizationLabelValid(uint8(_categorizationLabel))) {
+            miscData.categorizationLabel = _categorizationLabel;
+        }
+
+        if (_edition !=  editionData.edition) {
+            editionData.edition = _edition;
+        }
+
+        if (bytes(_editionExecutor).length > 0) {
+            editionData.editionExecutor = _editionExecutor;
+        }
+
+        if (_editionNumber > 0) {
+            editionData.editionNumber = _editionNumber;
+        }
+
         //emit SculptureUpdated()
     }
 }
