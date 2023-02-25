@@ -36,14 +36,14 @@ contract SculptureFactory {
         s_SculptureFactory = address(this);
     }
 
-    function parseSculptureData(SculptureLibrary.PersistentData memory _persistentData,
+    /*function parseSculptureData(SculptureLibrary.PersistentData memory _persistentData,
         SculptureLibrary.MiscellaneousData memory _miscData,
         SculptureLibrary.EditionData memory _editionData,
         SculptureLibrary.ConservationData memory _conservationData,
         string memory _sculptureOwner
     ) private {
 
-    }
+    }*/
 
     function createSculpture(
         SculptureLibrary.PersistentData memory _persistentData,
@@ -94,54 +94,94 @@ contract Sculpture {
         userAuthorizationInstance = UserAuthorization(_userAuthorizationAddress);
     }
 
-    // event SculptureUpdated(uint256 timestamp, address authorizedModifier);
+    struct UpdatedSculptureData {
+        string date;
+        string technique;
+        string dimensions;
+        string location;
+        string categorizationLabel;
+        string edition;
+        string editionExecutor;
+        string editionNumber;
+    }
+    
+    event SculptureUpdated(uint256 timestamp, address authorizedModifier, UpdatedSculptureData updatedData);
 
     // TODO: add the owner
     function updateSculpture(
-        uint256 _date,
+        string memory _date,
         string memory _technique,
         string memory _dimensions,
         string memory _location,
         SculptureLibrary.CategorizationLabel _categorizationLabel,
         bool _edition,
         string memory _editionExecutor,
-        uint256 _editionNumber
+        string memory _editionNumber
     ) public {
         // Checks if the user has privileges to update the data
         require(userAuthorizationInstance.isAuthorizedToUpdate(msg.sender) == true, "Your are not authorized to update a record.");
 
-        if (_date > 0) {
+        //TODO: parse the data to see if it is correct
+
+        // Initializes the updated data struct
+        UpdatedSculptureData memory updatedData = UpdatedSculptureData(
+            "Not updated",
+            "Not updated",
+            "Not updated",
+            "Not updated",
+            "Not updated",
+            "Not updated",
+            "Not updated",
+            "Not updated"
+        );
+
+        if (bytes(_date).length > 0) {
             miscData.date = _date;
+            updatedData.date = _date;
         }
 
         if (bytes(_technique).length > 0) {
             miscData.technique = _technique;
+            updatedData.technique = _technique;
         }
 
         if (bytes(_dimensions).length > 0) {
             miscData.dimensions = _dimensions;
+            updatedData.dimensions = _dimensions;
         }
 
         if (bytes(_location).length > 0) {
             miscData.location = _location;
+            updatedData.location = _location;
         }
 
         if (SculptureLibrary.isCategorizationLabelValid(uint8(_categorizationLabel))) {
             miscData.categorizationLabel = _categorizationLabel;
+            updatedData.categorizationLabel = SculptureLibrary.getCategorizationLabelAsString(_categorizationLabel);
         }
 
         if (_edition !=  editionData.edition) {
             editionData.edition = _edition;
+            
+            if (_edition) {
+                updatedData.edition = "Yes";
+            } else {
+                updatedData.edition = "No";
+            }
+            
         }
 
         if (bytes(_editionExecutor).length > 0) {
             editionData.editionExecutor = _editionExecutor;
+            updatedData.editionExecutor = _editionExecutor;
         }
 
-        if (_editionNumber > 0) {
+        if (bytes(_editionNumber).length > 0) {
             editionData.editionNumber = _editionNumber;
+            updatedData.editionNumber = _editionNumber;
         }
 
-        //emit SculptureUpdated()
+        lastChangeTimestamp = block.timestamp;
+        emit SculptureUpdated(lastChangeTimestamp, msg.sender, updatedData);
     }
 }
