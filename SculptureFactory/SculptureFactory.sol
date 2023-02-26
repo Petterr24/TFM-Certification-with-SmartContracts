@@ -56,7 +56,7 @@ contract SculptureFactory {
         require(userAuthorizationInstance.isAuthorizedToCreate(msg.sender) == true, "Your are not authorized to create a record.");
 
         //TODO: Check if the provided data is correct
-        Sculpture newSculpture = new Sculpture{value: msg.value}(_persistentData, _miscData, _editionData, _conservationData, _sculptureOwner, address(userAuthorizationInstance));
+        Sculpture newSculpture = new Sculpture{value: msg.value}(_persistentData, _miscData, _editionData, _conservationData, _sculptureOwner, address(userAuthorizationInstance),s_SculptureFactory);
         address newSculptureAddress = address(newSculpture);
 
         sculptures.push(newSculptureAddress);
@@ -70,6 +70,9 @@ contract SculptureFactory {
 contract Sculpture {
     // UserAuthorization instance
     UserAuthorization userAuthorizationInstance;
+
+    // SculptureFactory instance (parent)
+    SculptureFactory sculptureFactoryInstance;
 
     // UNIX Time of the last unit modification
     uint256 public lastChangeTimestamp;
@@ -87,7 +90,8 @@ contract Sculpture {
         SculptureLibrary.EditionData memory _editionData,
         SculptureLibrary.ConservationData memory _conservationData,
         string memory _sculptureOwner,
-        address _userAuthorizationAddress
+        address _userAuthorizationAddress,
+        address _sculptureFactoryAddress
     ) payable {
         persistentData = _persistentData;
         miscData = _miscData;
@@ -95,6 +99,7 @@ contract Sculpture {
         conservationData = _conservationData;
         sculptureOwner = _sculptureOwner;
         userAuthorizationInstance = UserAuthorization(_userAuthorizationAddress);
+        sculptureFactoryInstance = SculptureFactory(_sculptureFactoryAddress);
     }
 
     struct UpdatedSculptureData {
