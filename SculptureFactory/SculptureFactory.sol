@@ -100,6 +100,9 @@ contract Sculpture {
         require(_userAuthorizationAddress != address(0), "Invalid UserAuthorization SC address!");
         require(_sculptureFactoryAddress != address(0), "Invalid SculptureFactory SC address!");
 
+        userAuthorizationInstance = UserAuthorization(_userAuthorizationAddress);
+        sculptureFactoryInstance = SculptureFactory(_sculptureFactoryAddress);
+
         require(userAuthorizationInstance.isUserAuthorization(_userAuthorizationAddress) == true, "This address does not belong to the UserAuthorization SC!");
         require(sculptureFactoryInstance.isSculptureFactory(_sculptureFactoryAddress) == true, "This address does not belong to the SculptureFactory SC!");
 
@@ -108,8 +111,6 @@ contract Sculpture {
         editionData = _editionData;
         conservationData = _conservationData;
         sculptureOwner = _sculptureOwner;
-        userAuthorizationInstance = UserAuthorization(_userAuthorizationAddress);
-        sculptureFactoryInstance = SculptureFactory(_sculptureFactoryAddress);
     }
 
     struct UpdatedSculptureData {
