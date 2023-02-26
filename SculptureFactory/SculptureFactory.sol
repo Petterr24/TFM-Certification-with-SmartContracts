@@ -56,7 +56,7 @@ contract SculptureFactory {
         require(userAuthorizationInstance.isAuthorizedToCreate(msg.sender) == true, "Your are not authorized to create a record.");
 
         //TODO: Check if the provided data is correct
-        Sculpture newSculpture = new Sculpture{value: msg.value}(_persistentData, _miscData, _editionData, _conservationData, _sculptureOwner, address(userAuthorizationInstance), this);
+        Sculpture newSculpture = new Sculpture{value: msg.value}(_persistentData, _miscData, _editionData, _conservationData, _sculptureOwner, address(userAuthorizationInstance), address(this));
         address newSculptureAddress = address(newSculpture);
 
         sculptures.push(newSculptureAddress);
@@ -64,6 +64,10 @@ contract SculptureFactory {
         emit SculptureCreated(_persistentData, _miscData, _editionData, _conservationData);
 
         return newSculpture;
+    }
+
+    function isSculptureFactory(address addr) public view returns (bool) {
+        return addr == address(this);
     }
 }
 
@@ -91,15 +95,21 @@ contract Sculpture {
         SculptureLibrary.ConservationData memory _conservationData,
         string memory _sculptureOwner,
         address _userAuthorizationAddress,
-        SculptureFactory _sculptureFactoryInstance
+        address _sculptureFactoryAddress
     ) payable {
+        require(_userAuthorizationAddress != address(0), "Invalid UserAuthorization SC address!");
+        require(_sculptureFactoryAddress != address(0), "Invalid SculptureFactory SC address!");
+
+        require(userAuthorizationInstance.isUserAuthorization(_userAuthorizationAddress) == true, "This address does not belong to the UserAuthorization SC!");
+        require(sculptureFactoryInstance.isSculptureFactory(_sculptureFactoryAddress) == true, "This address does not belong to the SculptureFactory SC!");
+
         persistentData = _persistentData;
         miscData = _miscData;
         editionData = _editionData;
         conservationData = _conservationData;
         sculptureOwner = _sculptureOwner;
         userAuthorizationInstance = UserAuthorization(_userAuthorizationAddress);
-        sculptureFactoryInstance = _sculptureFactoryInstance;
+        sculptureFactoryInstance = SculptureFactory(_sculptureFactoryAddress);
     }
 
     struct UpdatedSculptureData {

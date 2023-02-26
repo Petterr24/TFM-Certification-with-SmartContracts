@@ -145,6 +145,10 @@ contract UserAuthorization {
         return (users[_userAddress].userAddress != address(0));
     }
 
+    function isUserAuthorization(address addr) public view returns (bool) {
+        return addr == address(this);
+    }
+
     function getNumAdmins() public view returns (uint256) {
         return numOfAdmins;
     }
