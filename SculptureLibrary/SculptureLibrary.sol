@@ -3,7 +3,8 @@ pragma solidity ^0.8.0;
 
 library SculptureLibrary {
 
-    enum CategorizationLabel { 
+    enum CategorizationLabel {
+        NONE,
         AUTHORIZED_UNIQUE_WORK, 
         AUTHORIZED_UNIQUE_WORK_VARIATION, 
         AUTHORIZED_WORK, 

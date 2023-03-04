@@ -206,7 +206,7 @@ contract Sculpture {
             updatedData.location = _location;
         }
 
-        if (SculptureLibrary.isCategorizationLabelValid(_categorizationLabel)) {
+        if ((_categorizationLabel != uint8(SculptureLibrary.CategorizationLabel.NONE)) && SculptureLibrary.isCategorizationLabelValid(_categorizationLabel)) {
             miscData.categorizationLabel = _categorizationLabel;
             updatedData.categorizationLabel = SculptureLibrary.getCategorizationLabelAsString(_categorizationLabel);
         }
