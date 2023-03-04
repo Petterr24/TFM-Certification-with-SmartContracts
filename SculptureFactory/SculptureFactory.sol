@@ -22,6 +22,8 @@ contract SculptureFactory {
         SculptureLibrary.ConservationData conservationData
     );
 
+    event SculptureAddress(address sculpture);
+
     constructor(address _userAuthorizationAddress) {
         // Checks if an instance of this Smart Contract already exists
         require(s_SculptureFactory == address(0), "The Instance of this Smart Contract already exists");
@@ -54,6 +56,8 @@ contract SculptureFactory {
         sculptures.push(newSculptureAddress);
 
         emit SculptureCreated(_persistentData, _miscData, _editionData, _conservationData);
+
+        emit SculptureAddress(newSculptureAddress);
 
         return newSculpture;
     }
