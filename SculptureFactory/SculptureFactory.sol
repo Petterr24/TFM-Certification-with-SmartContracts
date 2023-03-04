@@ -57,6 +57,7 @@ contract SculptureFactory {
 
         emit SculptureCreated(_persistentData, _miscData, _editionData, _conservationData);
 
+        // Emit the new Sculpture address
         emit SculptureAddress(newSculptureAddress);
 
         return newSculpture;
