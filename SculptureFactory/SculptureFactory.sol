@@ -96,8 +96,9 @@ contract Sculpture {
     // UNIX Time of the last unit modification
     uint256 public lastChangeTimestamp;
 
-    // Sculpture data
+    // The owner must be encrypted in the REST API before sending so that it is protected against miners
     string private sculptureOwner;
+    // Sculpture data
     SculptureLibrary.PersistentData public persistentData;
     SculptureLibrary.MiscellaneousData public miscData;
     SculptureLibrary.EditionData public editionData;
@@ -137,11 +138,11 @@ contract Sculpture {
         string edition;
         string editionExecutor;
         string editionNumber;
+        string sculptureOwner;
     }
     
     event SculptureUpdated(uint256 timestamp, address authorizedModifier, UpdatedSculptureData updatedData);
 
-    // TODO: add the owner
     function updateSculpture(
         string memory _date,
         string memory _technique,
@@ -150,15 +151,15 @@ contract Sculpture {
         uint8 _categorizationLabel,
         bool _edition,
         string memory _editionExecutor,
-        string memory _editionNumber
+        string memory _editionNumber,
+        string memory _sculptureOwner
     ) public {
         // Checks if the user has privileges to update the data
         require(userAuthorizationInstance.isAuthorizedToUpdate(msg.sender) == true, "Your are not authorized to update a record.");
 
-        //TODO: parse the data to see if it is correct
-
         // Initializes the updated data struct
         UpdatedSculptureData memory updatedData = UpdatedSculptureData(
+            "Not updated",
             "Not updated",
             "Not updated",
             "Not updated",
@@ -225,6 +226,14 @@ contract Sculpture {
 
             editionData.editionNumber = _editionNumber;
             updatedData.editionNumber = _editionNumber;
+        }
+
+        if (bytes(_sculptureOwner).length > 0) {
+            require(SculptureLibrary.checkMaxStringLength(_sculptureOwner) == true, "The Sculpture Owner field exceeds the maximum string length!");
+
+            sculptureOwner = _sculptureOwner;
+            // Avoid displaying the Sclupture Owner for confidentiality purposes. Just to notify that this value has been updated
+            updatedData.sculptureOwner = "Updated";
         }
 
         lastChangeTimestamp = block.timestamp;
