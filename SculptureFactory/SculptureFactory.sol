@@ -44,14 +44,16 @@ contract SculptureFactory {
         SculptureLibrary.EditionData memory _editionData,
         SculptureLibrary.ConservationData memory _conservationData,
         string memory _sculptureOwner
-    ) external payable returns (Sculpture) {
+    ) external payable returns (address) {
+        // This function can only be used by the root Factory SC
+        require(s_SculptureFactory == address(this));
+        
         // Checks if the user is an Admin user
         require(userAuthorizationInstance.isAuthorizedToCreate(msg.sender) == true, "Your are not authorized to create a record.");
 
         require(parseSculptureData(_persistentData, _miscData, _editionData, _conservationData, _sculptureOwner) == true);
 
-        Sculpture newSculpture = new Sculpture{value: msg.value}(_persistentData, _miscData, _editionData, _conservationData, _sculptureOwner, address(userAuthorizationInstance), address(this));
-        address newSculptureAddress = address(newSculpture);
+        address newSculptureAddress = address(new Sculpture{value: msg.value}(_persistentData, _miscData, _editionData, _conservationData, _sculptureOwner, address(userAuthorizationInstance), address(this)));
 
         // Emit the new Sculpture address
         emit SculptureAddress(newSculptureAddress);
@@ -61,7 +63,7 @@ contract SculptureFactory {
 
         sculptures.push(newSculptureAddress);
 
-        return newSculpture;
+        return newSculptureAddress;
     }
 
     function isSculptureFactory(address addr) public view returns (bool) {
