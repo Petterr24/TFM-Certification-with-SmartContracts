@@ -96,4 +96,33 @@ library SculptureLibrary {
 
         revert("Invalid Conservation Label");
     }
+
+    function isValidDate(string memory _date) internal pure returns (bool) {
+        bytes memory strBytes = bytes(_date);
+        if (strBytes.length == 6) {
+            // Parse data for a Date value such as "c.1993". "c." means aproximately
+            for (uint i = 0; i < strBytes.length; i++) {
+                if ((i == 0 && strBytes[i] != "c") || (i == 1 && strBytes[i] != ".") || (i > 2 && (uint8(strBytes[i]) < 48 || uint8(strBytes[i]) > 57))) {
+                    return false;
+                }
+            }
+        } else if (strBytes.length == 4) {
+            // Parse data for a Date value such as "1993" without "c."
+            for (uint i = 0; i < strBytes.length; i++) {
+                if (i > 0 && (uint8(strBytes[i]) < 48 || uint8(strBytes[i]) > 57)) {
+                    return false;
+                }
+            }
+        } else {
+            return false;
+        }
+
+        // If all checks passed, return true
+        return true;
+    }
+
+    function checkMaxStringLength(string memory _str) internal pure returns (bool) {      
+        // Maximum string length accepted to be stored in the SC
+        return bytes(_str).length <= 64;
+    }
 }
