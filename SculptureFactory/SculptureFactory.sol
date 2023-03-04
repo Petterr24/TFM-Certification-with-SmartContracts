@@ -44,7 +44,7 @@ contract SculptureFactory {
         SculptureLibrary.EditionData memory _editionData,
         SculptureLibrary.ConservationData memory _conservationData,
         string memory _sculptureOwner
-    ) public payable returns (Sculpture) {
+    ) public payable returns (address) {
         // Checks if the user is an Admin user
         require(userAuthorizationInstance.isAuthorizedToCreate(msg.sender) == true, "Your are not authorized to create a record.");
 
@@ -60,7 +60,7 @@ contract SculptureFactory {
         // Emit the new Sculpture address
         emit SculptureAddress(newSculptureAddress);
 
-        return newSculpture;
+        return newSculptureAddress;
     }
 
     function isSculptureFactory(address addr) public view returns (bool) {
