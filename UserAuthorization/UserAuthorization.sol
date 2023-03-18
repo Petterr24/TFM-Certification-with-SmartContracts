@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 contract UserAuthorization {
     // Singleton to allow only creating one Instance of this Smart Contract
     address private s_UserAuthorization;
-    
+
     // Count the number of admin users
     uint256 numOfAdmins;
 
@@ -28,7 +28,7 @@ contract UserAuthorization {
     constructor() {
         // Check if an instance of this Smart Contract already exists
         require(s_UserAuthorization == address(0), "The Instance of this Smart Contract already exists");
-        
+
         // Set the Instance address to the address of the contract
         s_UserAuthorization = address(this);
 
@@ -48,7 +48,6 @@ contract UserAuthorization {
     // Event for logging privilege modifications
     event NewUserPrivilege(
         address indexed userAddress,
-        string oldPrivilegeLevel,
         string newPrivilegeLevel
     );
 
@@ -105,7 +104,7 @@ contract UserAuthorization {
         }
 
         // Emits the event for logging the user authorization
-        emit NewUserPrivilege(_userAddress, getPrivilegeAsString(_oldPrivilegeLevel), getPrivilegeAsString(_newPrivilegeLevel));
+        emit NewUserPrivilege(_userAddress, getPrivilegeAsString(_newPrivilegeLevel));
     }
 
     // Removes an Authorized User
