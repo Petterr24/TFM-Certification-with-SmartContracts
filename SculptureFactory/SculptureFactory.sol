@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "../SculptureLibrary/SculptureLibrary.sol";
 import "../UserAuthorization/UserAuthorization.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract SculptureFactory {
 
@@ -86,7 +87,6 @@ contract SculptureFactory {
         require(SculptureLibrary.checkMaxStringLength(_miscData.location) == true, "The Location field exceeds the maximum string length!");
         require(SculptureLibrary.isCategorizationLabelValid(_miscData.categorizationLabel) == true, "The Categorizatoin Label is not a valid value!");
         require(SculptureLibrary.checkMaxStringLength(_editionData.editionExecutor) == true, "The Edition Excutor field exceeds the maximum string length!");
-        require(SculptureLibrary.checkMaxStringLength(_editionData.editionNumber) == true, "The Edition Number field exceeds the maximum string length!");
         require(SculptureLibrary.isConservationLabelValid(_conservationData.conservationLabel) == true, "The Conservation Label is not a valid value!");
         require(SculptureLibrary.checkMaxStringLength(_sculptureOwner) == true, "The Sculpture Owner field exceeds the maximum string length!");
 
@@ -103,6 +103,9 @@ contract Sculpture {
 
     // UNIX Time of the last unit modification
     uint256 public lastChangeTimestamp;
+
+    // Strings library from OpenZeppelin
+    using Strings for uint256;
 
     // The owner must be encrypted in the REST API before sending so that it is protected against miners
     string private sculptureOwner;
@@ -157,9 +160,9 @@ contract Sculpture {
         string memory _dimensions,
         string memory _location,
         uint8 _categorizationLabel,
-        bool _edition,
+        uint256 _edition,
         string memory _editionExecutor,
-        string memory _editionNumber,
+        uint256 _editionNumber,
         string memory _sculptureOwner
     ) public {
         // Checks if the user has privileges to update the data
@@ -211,15 +214,10 @@ contract Sculpture {
             updatedData.categorizationLabel = SculptureLibrary.getCategorizationLabelAsString(_categorizationLabel);
         }
 
+        // TODO: check what would happen when this value is not provided
         if (_edition !=  editionData.edition) {
             editionData.edition = _edition;
-            
-            if (_edition) {
-                updatedData.edition = "Yes";
-            } else {
-                updatedData.edition = "No";
-            }
-            
+            updatedData.edition = _edition.toString();
         }
 
         if (bytes(_editionExecutor).length > 0) {
@@ -229,11 +227,10 @@ contract Sculpture {
             updatedData.editionExecutor = _editionExecutor;
         }
 
-        if (bytes(_editionNumber).length > 0) {
-            require(SculptureLibrary.checkMaxStringLength(_editionNumber) == true, "The Edition Number field exceeds the maximum string length!");
-
+        // TODO: check what would happen when this value is not provided
+        if (_editionNumber !=  editionData.editionNumber) {
             editionData.editionNumber = _editionNumber;
-            updatedData.editionNumber = _editionNumber;
+            updatedData.editionNumber = _editionNumber.toString();
         }
 
         if (bytes(_sculptureOwner).length > 0) {

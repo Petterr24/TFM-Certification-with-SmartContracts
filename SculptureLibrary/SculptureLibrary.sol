@@ -40,9 +40,9 @@ library SculptureLibrary {
     }
 
     struct EditionData {
-        bool edition;
+        uint256 edition;
         string editionExecutor;
-        string editionNumber;
+        uint256 editionNumber;
     }
 
     struct ConservationData {
