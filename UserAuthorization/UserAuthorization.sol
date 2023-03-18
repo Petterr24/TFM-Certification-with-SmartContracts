@@ -54,6 +54,7 @@ contract UserAuthorization {
     // Event for logging user deletion
     event UserRemoved(
         address indexed userAddress
+        string info
     );
 
     // Authorizes a new user
@@ -121,7 +122,7 @@ contract UserAuthorization {
         users[_userAddress].privilegeLevel = uint8(PrivilegeLevel.NONE);
 
         // Emits the event for logging the user removal
-        emit UserRemoved(_userAddress);
+        emit UserRemoved(_userAddress, "Authorized user removed!");
     }
 
     // Checks if a user has the minimum privileges to create a Record
