@@ -25,7 +25,6 @@ library SculptureLibrary {
     }
 
     struct PersistentData {
-        string sculptureId;
         string name;
         string artist;
         string criticalCatalogNumber;

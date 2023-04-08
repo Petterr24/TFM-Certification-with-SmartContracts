@@ -145,7 +145,7 @@ contract UserAuthorization {
         return (users[_userAddress].userAddress != address(0));
     }
 
-    function isUserAuthorization(address addr) public view returns (bool) {
+    function isUserAuthorizationSC(address addr) public view returns (bool) {
         return addr == address(this);
     }
 
