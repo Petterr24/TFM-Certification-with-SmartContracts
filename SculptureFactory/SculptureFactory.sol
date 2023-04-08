@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "hardhat/console.sol";
-import "./SculptureLibrary.sol";
-import "./UserAuthorization.sol";
+import "../SculptureLibrary/SculptureLibrary.sol";
+import "../UserAuthorization/UserAuthorization.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract SculptureFactory {
@@ -60,6 +59,10 @@ contract SculptureFactory {
 
     function isSculptureFactory(address addr) public view returns (bool) {
         return addr == address(this);
+    }
+
+    function getSculptures() public view returns (address[] memory) {
+        return sculptures;
     }
 
     function parseSculptureData(SculptureLibrary.PersistentData memory _persistentData,
@@ -120,7 +123,7 @@ contract Sculpture {
         userAuthorizationInstance = UserAuthorization(_userAuthorizationAddress);
         sculptureFactoryInstance = SculptureFactory(_sculptureFactoryAddress);
 
-        require(userAuthorizationInstance.isUserAuthorization(_userAuthorizationAddress) == true, "This address does not belong to the UserAuthorization SC!");
+        require(userAuthorizationInstance.isUserAuthorizationSC(_userAuthorizationAddress) == true, "This address does not belong to the UserAuthorization SC!");
         require(sculptureFactoryInstance.isSculptureFactory(_sculptureFactoryAddress) == true, "This address does not belong to the SculptureFactory SC!");
 
         persistentData = _persistentData;
@@ -141,7 +144,16 @@ contract Sculpture {
         string editionNumber;
         string sculptureOwner;
     }
-    
+
+    function getSculptureData() public view returns (
+        SculptureLibrary.PersistentData memory,
+        SculptureLibrary.MiscellaneousData memory,
+        SculptureLibrary.EditionData memory,
+        SculptureLibrary.ConservationData memory
+    ) {
+        return [persistentData, miscData, editionData, conservationData];
+    }
+
     event SculptureUpdated(uint256 timestamp, address authorizedModifier, UpdatedSculptureData updatedData);
 
     function updateSculpture(
