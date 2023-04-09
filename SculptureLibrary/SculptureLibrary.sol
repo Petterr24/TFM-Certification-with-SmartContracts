@@ -19,6 +19,7 @@ library SculptureLibrary {
     }
     
     enum ConservationLabel {
+        NONE,
         AUTHORIZED_RECONSTRUCTION,
         AUTHORIZED_RESTORATION,
         AUTHORIZED_EPHEMERAL_WORK
