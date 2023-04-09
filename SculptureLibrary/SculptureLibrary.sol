@@ -55,7 +55,7 @@ library SculptureLibrary {
     }
 
     function isConservationLabelValid(uint8 label) internal pure returns (bool) {
-        return (label >= uint8(ConservationLabel.AUTHORIZED_RECONSTRUCTION) && label <= uint8(ConservationLabel.AUTHORIZED_EPHEMERAL_WORK));
+        return (label >= uint8(ConservationLabel.NONE) && label <= uint8(ConservationLabel.AUTHORIZED_EPHEMERAL_WORK));
     }
 
     function getCategorizationLabelAsString(uint8 _enum) internal pure returns (string memory) {
@@ -122,7 +122,7 @@ library SculptureLibrary {
         return true;
     }
 
-    function checkMaxStringLength(string memory _str) internal pure returns (bool) {      
+    function checkMaxStringLength(string memory _str) internal pure returns (bool) {
         // Maximum string length accepted to be stored in the SC
         return bytes(_str).length <= 64;
     }
