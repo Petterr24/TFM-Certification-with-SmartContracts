@@ -136,7 +136,7 @@ contract Sculpture {
         if (_conservationData.conservation) {
             conservationData.conservationLabel = _conservationData.conservationLabel;
         } else {
-            conservationData.conservationLabel = uint8(SculptureLibrary.ConservationData.NONE);
+            conservationData.conservationLabel = uint8(SculptureLibrary.ConservationLabel.NONE);
         }
     }
 
