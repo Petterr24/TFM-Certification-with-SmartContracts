@@ -5,24 +5,24 @@ library SculptureLibrary {
 
     enum CategorizationLabel {
         NONE,
-        AUTHORIZED_UNIQUE_WORK, 
-        AUTHORIZED_UNIQUE_WORK_VARIATION, 
-        AUTHORIZED_WORK, 
-        AUTHORIZED_MULTIPLE, 
-        AUTHORIZED_CAST, 
-        POSTHUMOUS_WORK_AUTHORIZED_BY_ARTIST, 
-        POSTHUMOUS_WORK_AUTHORIZED_BY_RIGHTSHOLDERS, 
-        AUTHORIZED_REPRODUCTION, 
-        AUTHORIZED_EXHIBITION_COPY, 
-        AUTHORIZED_TECHNICAL_COPY, 
-        AUTHORIZED_DIGITAL_COPY 
+        AUTHORISED_UNIQUE_WORK, 
+        AUTHORISED_UNIQUE_WORK_VARIATION, 
+        AUTHORISED_WORK, 
+        AUTHORISED_MULTIPLE, 
+        AUTHORISED_CAST, 
+        POSTHUMOUS_WORK_AUTHORISED_BY_ARTIST, 
+        POSTHUMOUS_WORK_AUTHORISED_BY_RIGHTSHOLDERS, 
+        AUTHORISED_REPRODUCTION, 
+        AUTHORISED_EXHIBITION_COPY, 
+        AUTHORISED_TECHNICAL_COPY, 
+        AUTHORISED_DIGITAL_COPY 
     }
     
     enum ConservationLabel {
         NONE,
-        AUTHORIZED_RECONSTRUCTION,
-        AUTHORIZED_RESTORATION,
-        AUTHORIZED_EPHEMERAL_WORK
+        AUTHORISED_RECONSTRUCTION,
+        AUTHORISED_RESTORATION,
+        AUTHORISED_EPHEMERAL_WORK
     }
 
     struct PersistentData {
@@ -50,52 +50,34 @@ library SculptureLibrary {
         uint8 conservationLabel;
     }
 
-    function isCategorizationLabelValid(uint8 label) internal pure returns (bool) {
-        return (label >= uint8(CategorizationLabel.AUTHORIZED_UNIQUE_WORK) && label <= uint8(CategorizationLabel.AUTHORIZED_DIGITAL_COPY));
+    function isCategorizationLabelValid(uint8 _label) internal pure returns (bool) {
+        return (_label >= uint8(CategorizationLabel.NONE) && _label <= uint8(CategorizationLabel.AUTHORISED_DIGITAL_COPY));
     }
 
-    function isConservationLabelValid(uint8 label) internal pure returns (bool) {
-        return (label >= uint8(ConservationLabel.NONE) && label <= uint8(ConservationLabel.AUTHORIZED_EPHEMERAL_WORK));
-    }
-
-    function getCategorizationLabelAsString(uint8 _enum) internal pure returns (string memory) {
-        if (_enum == uint8(CategorizationLabel.AUTHORIZED_UNIQUE_WORK)) {
-            return "Authorized unique work";
-        } else if (_enum == uint8(CategorizationLabel.AUTHORIZED_UNIQUE_WORK_VARIATION)) {
-            return "Authorized unique work variation";
-        } else if (_enum == uint8(CategorizationLabel.AUTHORIZED_WORK)) {
-            return "Authorized work";
-        } else if (_enum == uint8(CategorizationLabel.AUTHORIZED_MULTIPLE)) {
-            return "Authorized multiple";
-        } else if (_enum == uint8(CategorizationLabel.AUTHORIZED_CAST)) {
-            return "Authorized cast";
-        } else if (_enum == uint8(CategorizationLabel.POSTHUMOUS_WORK_AUTHORIZED_BY_ARTIST)) {
-            return "Posthumous work authorized by artist";
-        } else if (_enum == uint8(CategorizationLabel.POSTHUMOUS_WORK_AUTHORIZED_BY_RIGHTSHOLDERS)) {
-            return "Posthumous work authorized by rightsholders";
-        } else if (_enum == uint8(CategorizationLabel.AUTHORIZED_REPRODUCTION)) {
-            return "Authorized reproduction";
-        } else if (_enum == uint8(CategorizationLabel.AUTHORIZED_EXHIBITION_COPY)) {
-            return "Authorized exhibition copy";
-        } else if (_enum == uint8(CategorizationLabel.AUTHORIZED_TECHNICAL_COPY)) {
-            return "Authorized technical copy";
-        } else if (_enum == uint8(CategorizationLabel.AUTHORIZED_DIGITAL_COPY)) {
-            return "Authorized digital copy";
+    function isEditionDataValid(uint8 _categorizationLabel, EditionData memory _editionData) internal pure returns (bool) {
+        // Edition Data is only available for the following categorization labels:
+        // - AUTHORISED_REPRODUCTION
+        // - AUTHORISED_EXHIBITION_COPY
+        // - AUTHORISED_TECHNICAL_COPY
+        // - AUTHORISED_DIGITAL_COPY
+        bytes memory editionExecutorBytes = bytes(_editionData.editionExecutor);
+        if ((_editionData.edition != 0) || (_editionData.editionNumber != 0) || ((editionExecutorBytes.length == 1) && (editionExecutorBytes[0] != "-")) || (editionExecutorBytes.length > 1)) {
+            // The categorization label must be one of the supported ones when the Edition data is provided
+            if (_categorizationLabel < uint8(CategorizationLabel.AUTHORISED_REPRODUCTION)) {
+                return false;
+            }
+        } else {
+            // It is necessary to check that the Edition data is not missing when the one of the required Categorization Labels is provided
+            if (_categorizationLabel >= uint8(CategorizationLabel.AUTHORISED_REPRODUCTION)) {
+                return false;
+            }
         }
 
-        revert("Invalid Categorization Label");
+        return true;
     }
 
-    function getConservationLabelAsString(ConservationLabel _enum) internal pure returns (string memory) {
-        if (_enum == ConservationLabel.AUTHORIZED_RECONSTRUCTION) {
-            return "Authorized reconstruction";
-        } else if (_enum == ConservationLabel.AUTHORIZED_RESTORATION) {
-            return "Authorized restoration";
-        } else if (_enum == ConservationLabel.AUTHORIZED_EPHEMERAL_WORK) {
-            return "Authorized ephermal work";
-        }
-
-        revert("Invalid Conservation Label");
+    function isConservationLabelValid(uint8 _label) internal pure returns (bool) {
+        return (_label >= uint8(ConservationLabel.NONE) && _label <= uint8(ConservationLabel.AUTHORISED_EPHEMERAL_WORK));
     }
 
     function isValidDate(string memory _date) internal pure returns (bool) {
@@ -114,6 +96,34 @@ library SculptureLibrary {
                     return false;
                 }
             }
+        } else if (strBytes.length == 9 || strBytes.length == 11) {
+            // Parse data for a Date value such as "1990-1992" or "1990 - 1992". Both are valid
+            // Check format of string using ASCII table
+            for (uint i = 0; i < strBytes.length; i++) {
+                // Check the digits
+                if ((i < 4 || i > (strBytes.length - 5)) && (uint8(strBytes[i]) < 48 || uint8(strBytes[i]) > 57)) {
+                    return false;
+                }
+
+                // Check the hypen for "1990-1992"
+                if ((strBytes.length == 9) && (i == 4) && (strBytes[i] != "-")) {
+                    return false;
+                }
+
+                // Check the hypen and whitespaces for "1990 - 1992"
+                if ((strBytes.length == 11) && (i > 3 || i < 7)) {
+                    // Check the two whitespaces
+                    if ((i == 4 || i == 6) && uint8(strBytes[i]) != 32) {
+                        return false;
+                    }
+
+                    if (i == 5 && strBytes[i] != "-") {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         } else {
             return false;
         }
