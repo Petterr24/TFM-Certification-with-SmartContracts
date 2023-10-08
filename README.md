@@ -1,6 +1,7 @@
 # TFM-Certification-with-SmartContracts
-Smart Contracts to carry out a certification process for Sculptures in Blockchain.
+This thesis delves into the fusion of blockchain technology and the art industry, specifically focusing on the certification of sculptures in museum contexts. The main objective is to take advantage of blockchain capabilities to create a secure and verifiable system for issuing smart contracts that certify sculptures and provide a complete record of their data. Primarily based on the concept of a "Smart Contract Factory" implemented on the blockchain, offering authorized parties the ability to generate Sculpture Smart Contracts. These contracts encapsulate pertinent information about each sculpture, acting as digital certificates that interested parties can easily verify.
 
+## Smart Contracts architecture design
 The Architecture of this design is:
 
 ![Architecture design](images/architecture.PNG)
