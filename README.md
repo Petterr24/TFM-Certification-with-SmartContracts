@@ -4,11 +4,12 @@ This thesis delves into the fusion of blockchain technology and the art industry
 ## Smart Contracts architecture design
 The Architecture of this design is:
 
+- *Main architecture design:*
 ![Architecture design](images/architecture.PNG)
-*Architecture design*
 
+- *Architecture design for different Entities:*
 ![Architecture design for different Entities](images/architectureEntities.PNG)
-*Architecture design for different Entities*
+
 
 ## UserAuthorisation
 “UserAuthorisation” is the root Smart Contract in the entire hierarchy. The purpose of this Smart Contract is to enable the management of different privileges for each user and control user access when using both the capabilities provided by “SculptureFactory” and the “Sculpture” Smart Contracts. This control is necessary because, in accordance with the project requirements, certain data related to sculpture records can be modified after
